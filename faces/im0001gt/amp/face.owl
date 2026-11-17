@@ -562,7 +562,7 @@ face "amp" {
         plEdit = false
         sel = -1
         plMenu = ""
-        run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call provider.load --params $(jq -nc --arg id ${sh(sid)} '{provider:\"cliamp\",playlist:$id}') --wait; cliamp play")
+        run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call provider.load --params ${sh(toJson({provider: 'cliamp', playlist: sid}))} --wait; cliamp play")
       }
     }
   }
@@ -656,7 +656,7 @@ face "amp" {
                   fi
                   omalauncher pick ~/Downloads | while IFS= read -r p; do
                     [ -n "$p" ] || continue
-                    cliamp remote call url.load --params $(jq -nc --arg path "$p" '{path:$path,play:false}') --wait
+                    cliamp remote call url.load --params "$(jq -nc --arg path "$p" '{path:$path,play:false}')" --wait
                   done
                 """)
               }
@@ -686,7 +686,7 @@ face "amp" {
                 if name != "" {
                   plName = name
                   plMenu = ""
-                  run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call playlist.create --params $(jq -nc --arg n ${sh(name)} '{provider:\"local\",playlist:$n}') --wait >/dev/null 2>&1 || true; qtracks=$(cliamp remote call queue.list --params '{\"offset\":0,\"limit\":500}' --wait | jq -c '.job.result.tracks // .result.tracks // []'); cliamp remote call playlist.replace --params $(jq -nc --arg n ${sh(name)} --argjson qtracks \"$qtracks\" '{provider:\"local\",playlist:$n,tracks:$qtracks}') --wait")
+                  run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call playlist.create --params ${sh(toJson({provider: 'local', playlist: name}))} --wait >/dev/null 2>&1 || true; qtracks=$(cliamp remote call queue.list --params '{\"offset\":0,\"limit\":500}' --wait | jq -c '.job.result.tracks // .result.tracks // []'); pr=$(jq -nc --arg n ${sh(name)} --argjson qtracks \"$qtracks\" '{provider:\"local\",playlist:$n,tracks:$qtracks}'); cliamp remote call playlist.replace --params \"$pr\" --wait")
                 }
               }
             }
@@ -704,7 +704,7 @@ face "amp" {
                   haptic()
                   plName = name
                   plMenu = ""
-                  run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call playlist.create --params $(jq -nc --arg n ${sh(name)} '{provider:\"local\",playlist:$n}') --wait >/dev/null 2>&1 || true; qtracks=$(cliamp remote call queue.list --params '{\"offset\":0,\"limit\":500}' --wait | jq -c '.job.result.tracks // .result.tracks // []'); cliamp remote call playlist.replace --params $(jq -nc --arg n ${sh(name)} --argjson qtracks \"$qtracks\" '{provider:\"local\",playlist:$n,tracks:$qtracks}') --wait")
+                  run("if ! cliamp remote state >/dev/null 2>&1; then rm -f ~/.config/cliamp/cliamp.sock ~/.config/cliamp/cliamp.sock.pid; cliamp --daemon >/dev/null 2>&1 & sleep 0.6; fi; cliamp remote call playlist.create --params ${sh(toJson({provider: 'local', playlist: name}))} --wait >/dev/null 2>&1 || true; qtracks=$(cliamp remote call queue.list --params '{\"offset\":0,\"limit\":500}' --wait | jq -c '.job.result.tracks // .result.tracks // []'); pr=$(jq -nc --arg n ${sh(name)} --argjson qtracks \"$qtracks\" '{provider:\"local\",playlist:$n,tracks:$qtracks}'); cliamp remote call playlist.replace --params \"$pr\" --wait")
                 }
               }
             }
